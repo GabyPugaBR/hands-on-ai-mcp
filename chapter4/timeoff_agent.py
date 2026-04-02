@@ -1,11 +1,12 @@
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.streamable_http import streamablehttp_client
+import mcp
+
+from mcp.client.streamable_http import streamable_http_client
 
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langchain_mcp_adapters.prompts import load_mcp_prompt
 
 from langgraph.prebuilt import create_react_agent
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import ChatOpenAI
 
 import asyncio
 import os
@@ -20,16 +21,14 @@ load_dotenv()
 #-----------------------------------------------------------------------
 
 
-endpoint = os.getenv("ENDPOINT_URL")
-deployment = os.getenv("DEPLOYMENT_NAME")
-subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
-api_version=os.getenv("API_VERSION")
+# endpoint = os.getenv("ENDPOINT_URL")
+# deployment = os.getenv("DEPLOYMENT_NAME")
+# subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
+# api_version=os.getenv("API_VERSION")
 
-model=AzureChatOpenAI(
-    azure_endpoint=endpoint,
-    api_key=subscription_key,
-    api_version=api_version,
-    deployment_name=deployment,
+model=ChatOpenAI(
+    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+    model="gpt-4o"
 )
 #-----------------------------------------------------------------------
 # Define the HR timeoff agent that will use the MCP server
@@ -39,11 +38,11 @@ async def run_timeoff_agent(user: str, prompt: str,) -> str:
 
     # Make sure the right URL to the MCP Server is passed.
     # and MCP server is running and accessible
-    mcp_server_url="http://localhost:8000/mcp"
+    mcp_server_url="http://localhost:8000"
 
     try:
-        async with streamablehttp_client(mcp_server_url) as (read, write, _):
-            async with ClientSession(read, write) as session:
+        async with mcp.client.streamable_http.streamable_http_client(mcp_server_url) as (read, write, _):
+            async with mcp.ClientSession(read, write) as session:
                 print("initializing session")
                 await session.initialize()
 
@@ -65,7 +64,7 @@ async def run_timeoff_agent(user: str, prompt: str,) -> str:
                     {"messages": timeoff_prompt})
 
                 return agent_response["messages"][-1].content
-    except Exception as e:
+    except BaseException as e:
         print(f"Error: {e}")
         return "Error"
 

@@ -9,7 +9,7 @@ class TimeOffDatastore:
     #Initialize the database connection, create tables and seed data
     def __init__(self, db_path=":memory:"):
         print("Initializing TimeOffDatastore")
-        self.conn = sqlite3.connect(db_path)
+        self.conn = sqlite3.connect(db_path, check_same_thread=False)
         print("Creating tables and seeding data")
         self.create_tables()
         self.seed_data()

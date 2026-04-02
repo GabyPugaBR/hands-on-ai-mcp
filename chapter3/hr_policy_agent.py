@@ -4,7 +4,7 @@ from mcp.client.stdio import stdio_client
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langchain_mcp_adapters.prompts import load_mcp_prompt
 from langgraph.prebuilt import create_react_agent
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import ChatOpenAI
 
 import asyncio
 import os
@@ -18,16 +18,14 @@ load_dotenv()
 # Please replace the environment variables with your own values
 #-----------------------------------------------------------------------
 
-endpoint = os.getenv("ENDPOINT_URL")
-deployment = os.getenv("DEPLOYMENT_NAME")
-subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
-api_version=os.getenv("API_VERSION")
+# endpoint = os.getenv("ENDPOINT_URL")
+# deployment = os.getenv("DEPLOYMENT_NAME")
+# subscription_key = os.getenv("AZURE_OPENAI_API_KEY")
+# api_version=os.getenv("API_VERSION")
 
-model=AzureChatOpenAI(
-    azure_endpoint=endpoint,
-    api_key=subscription_key,
-    api_version=api_version,
-    deployment_name=deployment,
+model=ChatOpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    model="gpt-4o",
 )
 
 #-----------------------------------------------------------------------
@@ -44,7 +42,7 @@ async def run_hr_policy_agent(prompt: str) -> str:
 
     # Create the server parameters for the MCP server
     server_params = StdioServerParameters(
-        command="python",
+        command="python3",
         args=[hr_mcp_server_path],
     )
 

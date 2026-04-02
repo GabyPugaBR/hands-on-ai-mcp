@@ -21,7 +21,10 @@ def get_timeoff_balance(employee_name: str) -> str:
     """Get the timeoff balance for the employee, given their name"""
 
     print("Getting timeoff balance for employee: ", employee_name)
-    return timeoff_db.get_timeoff_balance(employee_name)
+    balance = timeoff_db.get_timeoff_balance(employee_name)
+    if balance is None:
+        return f"Employee {employee_name} not found"
+    return f"{employee_name} has {balance} days of time off remaining"
 
 #Tool to add a time off request for an employee
 @timeoff_mcp.tool() 
